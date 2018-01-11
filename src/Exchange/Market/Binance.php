@@ -12,11 +12,11 @@ class Binance implements ExchangeInterface
     /**
      * @var
      */
-    private $apiService;
+    private static $apiService;
 
     public function __construct($config)
     {
-        $this->apiService = new BinanceApiService($config['api_key'],$config['api_secret']);
+        self::$apiService = new BinanceApiService($config['api_key'],$config['api_secret']);
     }
 
     /**
@@ -28,9 +28,9 @@ class Binance implements ExchangeInterface
     {
         $client = new Client();
 
-        $request = $client->get("https://api.binance.com/api/v3/ticker/price?symbol={$symbol}");
+        $response = $client->get("https://api.binance.com/api/v3/ticker/price?symbol={$symbol}");
 
-        $response = json_decode($request->getBody()->getContents(), TRUE);
+        $response = json_decode($response->getBody()->getContents(), TRUE);
 
         return (float) $response['price'];
     }
@@ -41,7 +41,7 @@ class Binance implements ExchangeInterface
      */
     public static function buyOrder()
     {
-        // TODO: Implement buyOrder() method.
+        return true;
     }
 
     /**

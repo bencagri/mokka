@@ -12,7 +12,7 @@ class BinanceApiService extends BinanceApiContainer
     {
         $params['symbol'] = $symbol;
         dump($params);
-        return $this->_makeApiRequest('GET', 'ticker/price', 'SIGNED', $params);
+        return $this->_makeApiRequest('GET', 'ticker/price', 'SIGNED');
     }
 
 }
