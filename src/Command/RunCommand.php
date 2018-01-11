@@ -3,14 +3,16 @@
 namespace Mokka\Command;
 
 
-use Botta\Config\Configurator;
-
-use Botta\Exchange\ExchangeFactory;
+use Mokka\Config\Action;
+use Mokka\Config\Configurator;
+use Mokka\Exchange\ExchangeFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 
 
 class RunCommand extends Command
@@ -40,7 +42,10 @@ class RunCommand extends Command
         //get config first
         try {
 
+            $helper = $this->getHelper('question');
+
             $config = (new Configurator(__DIR__ . '/../../config'))->make();
+
 
             $interval  = $input->getOption('interval');
 
@@ -49,8 +54,16 @@ class RunCommand extends Command
             $market = (new ExchangeFactory($input->getOption('market')))->make([$marketConfig]);
 
             //get symbols's current price from exchange market
+            $price = $market::getPrice($input->getOption('symbol'));
 
             //get last action
+            $action = new Action(__DIR__ . '/../../logs');
+
+            $lastAction = $action->read();
+
+            if (!$lastAction){
+               $lastAction = $this->createActionFile($action, $helper, $input, $output, $price);
+            }
 
             //run the strategy
 
@@ -62,6 +75,36 @@ class RunCommand extends Command
         }catch (InvalidArgumentException $exception){
 
         }
+    }
+
+    /**
+     * @param Action $action
+     * @param Helper $helper
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return array
+     */
+    protected function createActionFile(Action $action, Helper $helper, InputInterface $input, OutputInterface $output, $price)
+    {
+
+        $question = new ChoiceQuestion(
+            'We need to know your first transaction. What do you want to do first?',
+            array('buy', 'sell'),
+            0
+        );
+
+        $question->setErrorMessage('Your response is invalid.');
+        $choosenAction = $helper->ask($input, $output, $question);
+
+        $actionContent = [
+            'last'=> $action->viceVersa($choosenAction),
+            'price' => $price
+        ];
+        $output->writeln("<info>OK. I will {$choosenAction} {$input->getOption('symbol')} first.</info>");
+        $action->write($actionContent);
+
+
+        return $actionContent;
     }
 
 
