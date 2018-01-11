@@ -3,9 +3,8 @@
 namespace Mokka\Command;
 
 
-use Botta\Config\Configurator;
-
-use Botta\Exchange\ExchangeFactory;
+use Mokka\Config\Configurator;
+use Mokka\Exchange\ExchangeFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
@@ -48,7 +47,9 @@ class RunCommand extends Command
             $marketConfig = $config->get('markets.'.  $input->getOption('market'));
             $market = (new ExchangeFactory($input->getOption('market')))->make([$marketConfig]);
 
+
             //get symbols's current price from exchange market
+            $market::getPrice($input->getOption('symbol'));
 
             //get last action
 
