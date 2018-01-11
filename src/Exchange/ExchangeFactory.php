@@ -23,7 +23,7 @@ class ExchangeFactory
      */
     public function __construct($class)
     {
-        $this->class = sprintf('\\Botta\\Exchange\\Market\\%s', ucfirst($class));
+        $this->class = sprintf('\\Mokka\\Exchange\\Market\\%s', ucfirst($class));
     }
 
     /**

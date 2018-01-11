@@ -3,7 +3,8 @@
 
 namespace Mokka\Exchange\Market;
 
-use Botta\Exchange\ExchangeInterface;
+use GuzzleHttp\Client;
+use Mokka\Exchange\ExchangeInterface;
 
 class Binance implements ExchangeInterface
 {
@@ -21,21 +22,24 @@ class Binance implements ExchangeInterface
     /**
      * Get symbol price from source
      * @param $symbol
-     * @return mixed
+     * @return float
      */
-    public function getPrice($symbol)
+    public static function getPrice($symbol) : float
     {
-        exit(1);
-//        var_dump($this->apiService->ping()->getBody()->getContents());
-//        $response =  $this->apiService->getSymbolPrice($symbol);
-//        dump($response);
+        $client = new Client();
+
+        $request = $client->get("https://api.binance.com/api/v3/ticker/price?symbol={$symbol}");
+
+        $response = json_decode($request->getBody()->getContents(), TRUE);
+
+        return (float) $response['price'];
     }
 
     /**
      * Put buy order
      * @return mixed
      */
-    public function buyOrder()
+    public static function buyOrder()
     {
         // TODO: Implement buyOrder() method.
     }
@@ -44,7 +48,7 @@ class Binance implements ExchangeInterface
      * Put sell order
      * @return mixed
      */
-    public function sellOrder()
+    public static function sellOrder()
     {
         // TODO: Implement sellOrder() method.
     }

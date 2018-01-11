@@ -9,18 +9,18 @@ interface ExchangeInterface
      * @param $symbol
      * @return float
      */
-    public function getPrice($symbol);
+    public static function getPrice($symbol) : float;
 
     /**
      * Put buy order
      * @return mixed
      */
-    public function buyOrder();
+    public static function buyOrder();
 
     /**
      * Put sell order
      * @return mixed
      */
-    public function sellOrder();
+    public static function sellOrder();
 
 }
