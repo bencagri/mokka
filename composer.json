@@ -1,0 +1,31 @@
+{
+  "name": "bencagri/mokka",
+  "description": "console application for crypto currency trading supports multiple markets",
+  "minimum-stability": "dev",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Cagri Kirbiyik",
+      "email": "hi@bencagri.com"
+    }
+  ],
+  "require": {
+    "symfony/console": "^4.0@dev",
+    "larislackers/php-binance": "dev-master",
+    "flatbase/flatbase": "dev-master",
+    "symfony/var-dumper": "^4.1@dev",
+    "hassankhan/config": "dev-master"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^5.0"
+  },
+  "bin": ["bin/mokka"],
+  "config": {
+    "bin-dir": "bin"
+  },
+  "autoload": {
+    "psr-4": {
+      "Mokka\\": "src/"
+    }
+  }
+}
