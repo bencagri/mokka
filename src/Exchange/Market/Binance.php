@@ -36,6 +36,16 @@ class Binance implements ExchangeInterface
     }
 
     /**
+     * Get historical prices
+     * @param $symbol
+     * @return array
+     */
+    public function getHistoricalPrices($symbol): array
+    {
+        // TODO: Implement getHistoricalPrices() method.
+    }
+
+    /**
      * Put buy order
      * @return mixed
      */
@@ -52,4 +62,14 @@ class Binance implements ExchangeInterface
     {
         // TODO: Implement sellOrder() method.
     }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'binance';
+    }
+
+
 }
