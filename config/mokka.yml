@@ -3,3 +3,7 @@ markets:
       api_key: YOUR_API_KEY
       api_secret: YOUR_API_SECRET
       maxFund: 0.001 #as BTC value. to be used for buying and selling
+
+indicators:
+    percent:
+      defaultPercent: 1.3
