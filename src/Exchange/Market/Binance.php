@@ -24,7 +24,7 @@ class Binance implements ExchangeInterface
      * @param $symbol
      * @return float
      */
-    public static function getPrice($symbol) : float
+    public function getPrice($symbol) : float
     {
         $client = new Client();
 
@@ -39,7 +39,7 @@ class Binance implements ExchangeInterface
      * Put buy order
      * @return mixed
      */
-    public static function buyOrder()
+    public function buyOrder()
     {
         return true;
     }
@@ -48,7 +48,7 @@ class Binance implements ExchangeInterface
      * Put sell order
      * @return mixed
      */
-    public static function sellOrder()
+    public function sellOrder()
     {
         // TODO: Implement sellOrder() method.
     }
