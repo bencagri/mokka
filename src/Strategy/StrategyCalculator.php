@@ -3,8 +3,9 @@
 namespace Mokka\Strategy;
 
 
-use Flatbase\Flatbase;
-use Mokka\Config\Action;
+use Mokka\Action\Action;
+use Mokka\Action\ActionInterface;
+use Mokka\Config\Logger;
 use Mokka\Exchange\ExchangeInterface;
 
 class StrategyCalculator
@@ -19,14 +20,6 @@ class StrategyCalculator
      */
     private static $indicator;
 
-    /**
-     * @var Action
-     */
-    private static $action;
-    /**
-     * @var Flatbase
-     */
-    private static $database;
 
     /**
      * @var
@@ -38,36 +31,51 @@ class StrategyCalculator
      */
     private $interval;
 
-    private static $dbName;
-
+    /**
+     * @var
+     */
+    private $market;
     /**
      * StrategyCalculator constructor.
      * @param ExchangeInterface $exchange
      * @param IndicatorInterface $indicator
-     * @param Action $action
-     * @param Flatbase $database
      */
     public function __construct(
         ExchangeInterface $exchange,
-        IndicatorInterface $indicator,
-        Action $action,
-        Flatbase $database
+        IndicatorInterface $indicator
     )
     {
         self::$exchange = $exchange;
         self::$indicator = $indicator;
-        self::$action = $action;
-        self::$database = $database;
-
-        self::$dbName = (new \DateTime())->format('Y-m-d');
 
     }
 
-
-    public function run()
+    public function run(Logger $logger): Action
     {
+        //get last action and price from logs
+        $lastAction = $logger
+            ->read()
+            ->where('market', '=', $this->getMarket())
+            ->where('symbol','=',$this->getSymbol())
+            ->sortDesc('lastUpdate')
+            ->limit(1)
+            ->first();
+
+        $lastAction = new Action($lastAction);
+
         //calculate in loop by interval
-        self::$indicator->calculate($this->getSymbol());
+        /** @var ActionInterface $actionType */
+        $actionType = self::$indicator->calculate($this->getSymbol(),$lastAction);
+
+        $action = new Action();
+        $action->setType($actionType->getType());
+        $action->setSymbol($this->getSymbol());
+        $action->setMarket($this->getMarket());
+        $action->setPreviousPrice($lastAction->getActionPrice());
+        $action->setActionPrice($actionType->getActionPrice());
+        $action->setLastUpdate(time());
+
+        return $action;
     }
 
     /**
@@ -100,6 +108,22 @@ class StrategyCalculator
     public function setInterval($interval)
     {
         $this->interval = $interval;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMarket()
+    {
+        return $this->market;
+    }
+
+    /**
+     * @param mixed $market
+     */
+    public function setMarket($market)
+    {
+        $this->market = $market;
     }
 
 }
