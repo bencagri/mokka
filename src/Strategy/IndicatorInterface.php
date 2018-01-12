@@ -1,7 +1,16 @@
 <?php
 namespace Mokka\Strategy;
 
+use Mokka\Action\Action;
+use Mokka\Action\ActionInterface;
+
 interface IndicatorInterface
 {
-    public function calculate($symbol);
+    /**
+     * Indicator Calculator
+     * @param $symbol
+     * @param $lastAction Action
+     * @return ActionInterface
+     */
+    public function calculate($symbol, Action $lastAction): ActionInterface;
 }
