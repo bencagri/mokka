@@ -3,16 +3,24 @@
 namespace Mokka\Command;
 
 
-use Mokka\Config\Action;
+use Mokka\Action\Action;
+use Mokka\Action\ActionInterface;
 use Mokka\Config\Configurator;
+use Mokka\Config\Logger;
 use Mokka\Exchange\ExchangeFactory;
+use Mokka\Strategy\IndicatorFactory;
+use Mokka\Strategy\StrategyCalculator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\Question;
 
 
 class RunCommand extends Command
@@ -27,6 +35,7 @@ class RunCommand extends Command
             ->addOption('market','m',InputOption::VALUE_OPTIONAL,'Choose market to run','binance')
             ->addOption('interval','i',InputOption::VALUE_OPTIONAL,'Seconds for each requests. Default: 60',60)
             ->addOption('symbol','s',InputOption::VALUE_OPTIONAL,'Symbol for the bot to run','BTCUSDT')
+            ->addOption('indicator','it',InputOption::VALUE_OPTIONAL,'Which indicator will be applied? (for future development)','percent')
             ->addOption('test','t',InputOption::VALUE_OPTIONAL,'Test mode for botta. If set TRUE botta will not buy and sell any crypto currency',false)
 
         ;
@@ -42,69 +51,112 @@ class RunCommand extends Command
         //get config first
         try {
 
-            $helper = $this->getHelper('question');
-
             $config = (new Configurator(__DIR__ . '/../../config'))->make();
-
-
-            $interval  = $input->getOption('interval');
 
             //check if Exchange Market provider is available
             $marketConfig = $config->get('markets.'.  $input->getOption('market'));
             $market = (new ExchangeFactory($input->getOption('market')))->make([$marketConfig]);
 
-            //get symbols's current price from exchange market
-            $price = $market::getPrice($input->getOption('symbol'));
+            //set logs (txt db)
+            $logger = new Logger(__DIR__ . '/../../logs/', (new \DateTime())->format('Y-m-d'));
 
-            //get last action
-            $action = new Action(__DIR__ . '/../../logs');
+            //check the first row in logs
+            $this->createActionFile($logger,$input,$output);
 
-            $lastAction = $action->read();
+            //get indicator
+            $indicatorConfig = $config->get('indicators.'.  $input->getOption('indicator'));
+            $indicator = (new IndicatorFactory($input->getOption('indicator')))
+                ->make([$market,$logger,$indicatorConfig]);
 
-            if (!$lastAction){
-               $lastAction = $this->createActionFile($action, $helper, $input, $output, $price);
+
+            //run strategy calculator
+            $strategy = new StrategyCalculator($market, $indicator);
+
+            $strategy->setInterval($input->getOption('interval'));
+            $strategy->setSymbol($input->getOption('symbol'));
+            $strategy->setMarket($input->getOption('market'));
+
+            $output->writeln('<info>Mokka Started!</info>');
+            $table = new Table($output);
+            $table->setHeaders(array('Action', 'Previous Price', 'Action Price', 'Symbol'));
+
+            while(1){
+                $action = $strategy->run($logger);
+
+                //log the action
+                if ($action->getType() != ActionInterface::TYPE_IDLE) {
+                    $logger->insert()->set($action->toArray())->execute();
+                }
+
+                $table->setRows(array(
+                    array($action->getType(), $action->getPreviousPrice(), $action->getActionPrice(), $action->getSymbol()),
+                ));
+                $table->render();
+
+                sleep($input->getOption('interval'));
             }
 
-            //run the strategy
+            $output->writeln('<question>Mokka stopped!</question>');
 
-            //if strategy returns do buy or sell action based on last action
-
-
-            $output->writeln('It Works!');
-
-        }catch (InvalidArgumentException $exception){
-
+        } catch (\Exception $exception){
+            $output->writeln("<error>{$exception->getMessage()}</error>");
         }
     }
 
     /**
-     * @param Action $action
-     * @param Helper $helper
+     * @param Logger $logger
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return array
+     * @internal param Logger $action
      */
-    protected function createActionFile(Action $action, Helper $helper, InputInterface $input, OutputInterface $output, $price)
+    protected function createActionFile(Logger $logger, InputInterface $input, OutputInterface $output)
     {
 
-        $question = new ChoiceQuestion(
-            'We need to know your first transaction. What do you want to do first?',
+        $lastAction = $logger
+            ->read()
+            ->where('market', '=', $input->getOption('market'))
+            ->where('symbol','=',$input->getOption('symbol'))
+            ->sortDesc('lastUpdate')
+            ->limit(1)
+            ->first();
+
+        if($lastAction){
+            return;
+        }
+
+        $helper = $this->getHelper('question');
+
+        $question1 = new ChoiceQuestion(
+            "We need to know your last transaction. Please check the market ({$input->getOption('market')}) and set your last action for {$input->getOption('symbol')}.",
             array('buy', 'sell'),
             0
         );
 
-        $question->setErrorMessage('Your response is invalid.');
-        $choosenAction = $helper->ask($input, $output, $question);
-
-        $actionContent = [
-            'last'=> $action->viceVersa($choosenAction),
-            'price' => $price
-        ];
-        $output->writeln("<info>OK. I will {$choosenAction} {$input->getOption('symbol')} first.</info>");
-        $action->write($actionContent);
+        $question1->setErrorMessage('Your response is invalid.');
+        $chosenActionType = $helper->ask($input, $output, $question1);
 
 
-        return $actionContent;
+        $question2 = new Question("What was the last price for {$input->getOption('symbol')}?");
+        $price = $helper->ask($input, $output, $question2);
+
+        if (!$price){
+            $output->writeln("<comment>You need to tell me the last action price. Otherwise I can not move on.</comment>");
+            die();
+        }
+
+        $actionContent = new Action();
+        $actionContent->setType($chosenActionType);
+        $actionContent->setSymbol( $input->getOption('symbol'));
+        $actionContent->setLastUpdate(time());
+        $actionContent->setMarket($input->getOption('market'));
+        $actionContent->setPreviousPrice($price);
+        $actionContent->setActionPrice($price);
+
+        $output->writeln("<info>OK. I know what to do  now ;) .</info>");
+        $logger->insert()->set($actionContent->toArray())->execute();
+
+        return (array) $actionContent;
     }
 
 
