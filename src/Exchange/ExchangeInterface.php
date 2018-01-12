@@ -12,6 +12,13 @@ interface ExchangeInterface
     public function getPrice($symbol) : float;
 
     /**
+     * Get historical prices
+     * @param $symbol
+     * @return array
+     */
+    public function getHistoricalPrices($symbol) : array;
+
+    /**
      * Put buy order
      * @return mixed
      */
@@ -22,5 +29,7 @@ interface ExchangeInterface
      * @return mixed
      */
     public function sellOrder();
+
+    public function getName();
 
 }
