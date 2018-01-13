@@ -1,5 +1,6 @@
-vendor
 .idea
+vendor
+logs/*
 bin/*
 !bin/mokka
 
