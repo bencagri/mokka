@@ -2,6 +2,7 @@
 <?php
 
 require __DIR__.'/../vendor/autoload.php';
+use Mokka\Command\ReportCommand;
 use Mokka\Command\RunCommand;
 use Symfony\Component\Console\Application;
 
@@ -9,6 +10,7 @@ $application = new Application();
 
 // ... register commands
 $application->add(new RunCommand());
+$application->add(new ReportCommand());
 
 
 $application->run();
