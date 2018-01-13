@@ -8,7 +8,7 @@ To install and use **Mokka**, first, you will need;
 
 Then, (if git is installed) open terminal and type;
 ```bash
-$ git clone git@github.com:bencagri/mokka.git
+$ git clone https://github.com/bencagri/mokka.git
 $ cd mokka
 $ composer install
 ```
