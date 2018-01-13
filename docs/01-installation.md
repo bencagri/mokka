@@ -45,5 +45,5 @@ $ bin/mokka run --symbol=BTCUSD --interval=90
 ```
 
 #### Next
-Check [the parameters](02-parameters.md) that you can use with command.
+Check [the reports](03-reports.md) and see what actions mokka did. []()
 

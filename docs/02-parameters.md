@@ -18,3 +18,5 @@ Example;
 
 this command will check ETHBTC symbol's price on every 2 minutes (120 seconds) and work in test mode. you will see only signals before trading.
 
+#### Next
+Check [the reports](03-reports.md) that you can use with command.
