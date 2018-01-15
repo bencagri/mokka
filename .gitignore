@@ -1,6 +1,7 @@
 .idea
 vendor
 logs/*
+!logs/index.html
 bin/*
 !bin/mokka
 
