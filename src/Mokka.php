@@ -1,7 +1,7 @@
 <?php
 namespace Mokka;
 
-class Botta
+class Mokka
 {
 
 }

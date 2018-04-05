@@ -3,8 +3,12 @@
 namespace Mokka\Strategy;
 
 
+use DoctrineTest\InstantiatorTestAsset\AbstractClassAsset;
 use Mokka\Action\Action;
 use Mokka\Action\ActionInterface;
+use Mokka\Action\BuyAction;
+use Mokka\Action\IdleAction;
+use Mokka\Action\SellAction;
 use Mokka\Config\Logger;
 use Mokka\Exchange\ExchangeInterface;
 
@@ -67,7 +71,15 @@ class StrategyCalculator
         /** @var ActionInterface $actionType */
         $actionType = self::$indicator->calculate($this->getSymbol(),$lastAction);
 
-        $action = new Action();
+        if ($actionType->getType() == ActionInterface::TYPE_BUY) {
+            $action = new BuyAction();
+        }elseif ( $actionType->getType() == ActionInterface::TYPE_SELL) {
+            $action = new SellAction();
+        }elseif ( $actionType->getType() == ActionInterface::TYPE_IDLE) {
+            $action = new IdleAction();
+        }
+
+
         $action->setType($actionType->getType());
         $action->setSymbol($this->getSymbol());
         $action->setMarket($this->getMarket());

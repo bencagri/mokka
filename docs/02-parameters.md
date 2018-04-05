@@ -9,6 +9,7 @@ You can use parameters below for **Mokka**
 |`--market`   | the market that you can choose |  no  |  binance  |   
 |`--interval` | the period (as seconds) of making requests | no  |  60  |   
 |`--symbol`   | Botta will check the strategy and prices for this symbol. ie. ETHBTC  | yes  |  - |  
+|`--config`   | If you want to run multiple commands with different configuration, you can use this option | no  |  default |  
 |`--test`     | You may want to use Botta in test mode. if set `True`, botta will work without making trading | no  |  false |  
 
 

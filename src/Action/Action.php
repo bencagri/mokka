@@ -5,8 +5,11 @@ namespace Mokka\Action;
 
 class Action
 {
+
+    /** @var  double */
     protected $actionPrice;
 
+    /** @var  double */
     protected $previousPrice;
 
     protected $type;

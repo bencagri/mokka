@@ -5,11 +5,14 @@ namespace Mokka\Command;
 
 use Mokka\Action\Action;
 use Mokka\Action\ActionInterface;
+use Mokka\Action\BuyAction;
+use Mokka\Action\SellAction;
 use Mokka\Config\Configurator;
 use Mokka\Config\Logger;
 use Mokka\Exchange\ExchangeFactory;
 use Mokka\Strategy\IndicatorFactory;
 use Mokka\Strategy\StrategyCalculator;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -31,11 +34,12 @@ class RunCommand extends Command
         $this
             // the name of the command (the part after "bin/console")
             ->setName('run')
-            ->setDescription('Run Botta! Run!')
+            ->setDescription('Run Mokka! Run!')
             ->addOption('market','m',InputOption::VALUE_OPTIONAL,'Choose market to run','binance')
             ->addOption('interval','i',InputOption::VALUE_OPTIONAL,'Seconds for each requests. Default: 60',60)
             ->addOption('symbol','s',InputOption::VALUE_OPTIONAL,'Symbol for the bot to run','BTCUSDT')
             ->addOption('indicator','it',InputOption::VALUE_OPTIONAL,'Which indicator will be applied? (for future development)','percent')
+            ->addOption('config','c',InputOption::VALUE_OPTIONAL,'default config file. you can use custom config for each command','default')
             ->addOption('test','t',InputOption::VALUE_OPTIONAL,'Test mode for botta. If set TRUE botta will not buy and sell any crypto currency',false)
 
         ;
@@ -50,8 +54,7 @@ class RunCommand extends Command
     {
         //get config first
         try {
-
-            $config = (new Configurator(__DIR__ . '/../../config'))->make();
+            $config = (new Configurator(__DIR__ . '/../../config/'.$input->getOption('config').'.yml'))->make();
 
             //check if Exchange Market provider is available
             $marketConfig = $config->get('markets.'.  $input->getOption('market'));
@@ -78,10 +81,34 @@ class RunCommand extends Command
 
             $output->writeln('<info>Mokka Started!</info>');
             $table = new Table($output);
-            $table->setHeaders(array('Action', 'Previous Price', 'Action Price', 'Symbol'));
+            $table->setHeaders(array('Action', 'Previous Price', 'Action Price', 'Symbol','Amount'));
 
             while(1){
                 $action = $strategy->run($logger);
+
+                if ($input->getOption('test') === false) {
+                    if( $action->getType() == ActionInterface::TYPE_BUY) {
+                        //calculate quantity
+                        $maxFund = $config->get('markets.'.  $input->getOption('market') .'.maxFund');
+                        $quantity = $maxFund / $action->getActionPrice();
+
+                        /** @var BuyAction $action */
+                        $action->setQuantity($quantity);
+                        $market->buyOrder($action);
+                    }
+
+
+                    if ($action->getType() == ActionInterface::TYPE_SELL) {
+                        //get quantity to sell
+                        $maxSell = $config->get('markets.'.  $input->getOption('market') .'.maxSell');
+                        $quantity = ($maxSell / 100) * $action->getQuantity();
+
+                        $action->setQuantity($quantity);
+
+                        /** @var  SellAction $action */
+                        $market->sellOrder($action);
+                    }
+                }
 
                 //log the action
                 if ($action->getType() != ActionInterface::TYPE_IDLE) {
@@ -89,8 +116,9 @@ class RunCommand extends Command
                 }
 
                 $table->setRows(array(
-                    array($action->getType(), $action->getPreviousPrice(), $action->getActionPrice(), $action->getSymbol()),
+                    array($action->getType(), $action->getPreviousPrice(), $action->getActionPrice(), $action->getSymbol(), $action->getQuantity()),
                 ));
+
                 $table->render();
 
                 sleep($input->getOption('interval'));
@@ -98,6 +126,8 @@ class RunCommand extends Command
 
             $output->writeln('<question>Mokka stopped!</question>');
 
+        } catch (InvalidConfigurationException $exception){
+            $output->writeln("<error>Invalid Configuration</error>");
         } catch (\Exception $exception){
             $output->writeln("<error>{$exception->getMessage()}</error>");
         }

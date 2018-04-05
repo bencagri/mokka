@@ -33,11 +33,8 @@ class Configurator
      */
     public function make()
     {
-        if (is_dir($this->directory)) {
-            return new Config($this->directory);
-        }
+        return new Config($this->directory);
 
-        throw new InvalidConfigurationException();
     }
 
 }

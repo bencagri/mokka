@@ -25,8 +25,13 @@ Mokka is being installed now.
 > [intructions](https://coinigy.freshdesk.com/support/solutions/articles/1000256048-how-do-i-find-my-api-key-on-binance-com-).
 
 
-Then go to *config* directory and open *mokka.yml* file
+Then go to *config* directory and copy *default.dist* as *default.yml*
 
+``` 
+cp config/default.dist config/default.yml
+```
+
+And open your *default.yml* file and change variables
 
 ```$xslt
 markets:
@@ -45,5 +50,5 @@ $ bin/mokka run --symbol=BTCUSD --interval=90
 ```
 
 #### Next
-Check [the reports](03-reports.md) and see what actions mokka did. []()
+Check [the parameters](02-parameters.md) and see how you can configure. []()
 

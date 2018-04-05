@@ -4,6 +4,8 @@
 namespace Mokka\Exchange\Market;
 
 use GuzzleHttp\Client;
+use Mokka\Action\BuyAction;
+use Mokka\Action\SellAction;
 use Mokka\Exchange\ExchangeInterface;
 
 class Binance implements ExchangeInterface
@@ -47,20 +49,53 @@ class Binance implements ExchangeInterface
 
     /**
      * Put buy order
-     * @return mixed
+     * @param BuyAction $action
+     * @return mixed|\Psr\Http\Message\ResponseInterface
      */
-    public function buyOrder()
+    public function buyOrder(BuyAction $action)
     {
-        return true;
+
+        $getServerTime = self::$apiService->getServerTime()->getBody()->getContents();
+        $getServerTime = json_decode($getServerTime, true);
+
+        $params = [
+            'symbol' => $action->getSymbol(),
+            'price' => $action->getActionPrice(),
+            'quantity' => round($action->getQuantity(),2),
+            'side'  => 'BUY',
+            'type'  => 'LIMIT',
+            'timeInForce' => 'GTC',
+            'recvWindow' => 5000,
+            'timestamp' => $getServerTime['serverTime']
+        ];
+
+        return self::$apiService->postOrderTest($params);
     }
 
     /**
      * Put sell order
+     * @param SellAction $action
      * @return mixed
      */
-    public function sellOrder()
+    public function sellOrder(SellAction $action)
     {
-        // TODO: Implement sellOrder() method.
+
+        $getServerTime = self::$apiService->getServerTime()->getBody()->getContents();
+        $getServerTime = json_decode($getServerTime, true);
+
+        $params = [
+            'symbol' => $action->getSymbol(),
+            'price' => $action->getActionPrice(),
+            'quantity' => $action->getQuantity(),
+            'side'  => 'SELL',
+            'type'  => 'LIMIT',
+            'timeInForce' => 'GTC',
+            'recvWindow' => 10000000,
+            'timestamp' => $getServerTime['serverTime']
+
+        ];
+
+        return self::$apiService->postOrderTest($params);
     }
 
     /**

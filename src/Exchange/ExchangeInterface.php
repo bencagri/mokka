@@ -2,6 +2,9 @@
 
 namespace Mokka\Exchange;
 
+use Mokka\Action\BuyAction;
+use Mokka\Action\SellAction;
+
 interface ExchangeInterface
 {
     /**
@@ -20,15 +23,17 @@ interface ExchangeInterface
 
     /**
      * Put buy order
+     * @param BuyAction $action
      * @return mixed
      */
-    public function buyOrder();
+    public function buyOrder(BuyAction $action);
 
     /**
      * Put sell order
+     * @param SellAction $action
      * @return mixed
      */
-    public function sellOrder();
+    public function sellOrder(SellAction $action);
 
     public function getName();
 
