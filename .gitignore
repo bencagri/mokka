@@ -4,4 +4,4 @@ logs/*
 !logs/index.html
 bin/*
 !bin/mokka
-
+config/default.yml

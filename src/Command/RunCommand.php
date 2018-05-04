@@ -48,7 +48,8 @@ class RunCommand extends Command
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @return mixed
+     * @return int|null|void
+     * @throws \Symfony\Component\Debug\Exception\ClassNotFoundException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -81,7 +82,7 @@ class RunCommand extends Command
 
             $output->writeln('<info>Mokka Started!</info>');
             $table = new Table($output);
-            $table->setHeaders(array('Action', 'Previous Price', 'Action Price', 'Symbol','Amount'));
+            $table->setHeaders(array('Action', 'Previous Price', 'Action Price', 'Symbol', 'Amount', 'Trigger', 'Change', 'Date'));
 
             while(1){
                 $action = $strategy->run($logger);
@@ -116,7 +117,16 @@ class RunCommand extends Command
                 }
 
                 $table->setRows(array(
-                    array($action->getType(), $action->getPreviousPrice(), $action->getActionPrice(), $action->getSymbol(), $action->getQuantity()),
+                    array(
+                        $action->getType(),
+                        $action->getPreviousPrice(),
+                        $action->getActionPrice(),
+                        $action->getSymbol(),
+                        $action->getQuantity(),
+                        $config->get('indicators.percent.defaultPercent'),
+                        round($action->getActionPrice() / $action->getPreviousPrice(), 5),
+                        date('Y-m-d H:i:s')
+                    ),
                 ));
 
                 $table->render();
