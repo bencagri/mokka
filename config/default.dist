@@ -1,3 +1,7 @@
+mokka:
+    #date or symbol, default is symbol
+    default_log_type: date
+
 markets:
     binance:
       api_key: YOUR_API_KEY

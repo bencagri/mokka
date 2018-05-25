@@ -14,11 +14,7 @@ use Mokka\Strategy\IndicatorFactory;
 use Mokka\Strategy\StrategyCalculator;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -62,7 +58,12 @@ class RunCommand extends Command
             $market = (new ExchangeFactory($input->getOption('market')))->make([$marketConfig]);
 
             //set logs (txt db)
-            $logger = new Logger(__DIR__ . '/../../logs/', (new \DateTime())->format('Y-m-d'));
+            $logFileType =
+                $config->get('mokka.default_log_type') == 'date'
+                    ? (new \DateTime())->format('Y-m-d')
+                    : $input->getOption('symbol');
+
+            $logger = new Logger(__DIR__ . '/../../logs/', $logFileType);
 
             //check the first row in logs
             $this->createActionFile($logger,$input,$output);
