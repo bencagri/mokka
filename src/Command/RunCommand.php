@@ -91,7 +91,7 @@ class RunCommand extends Command
                 if ($input->getOption('test') === false) {
                     if( $action->getType() == ActionInterface::TYPE_BUY) {
                         //calculate quantity
-                        $maxFund = $config->get('markets.'.  $input->getOption('market') .'.maxFund');
+                        $maxFund = $config->get('markets.'.  $input->getOption('market') .'.max_fund');
                         $quantity = $maxFund / $action->getActionPrice();
 
                         /** @var BuyAction $action */
@@ -102,7 +102,7 @@ class RunCommand extends Command
 
                     if ($action->getType() == ActionInterface::TYPE_SELL) {
                         //get quantity to sell
-                        $maxSell = $config->get('markets.'.  $input->getOption('market') .'.maxSell');
+                        $maxSell = $config->get('markets.'.  $input->getOption('market') .'.max_sell');
                         $quantity = ($maxSell / 100) * $action->getQuantity();
 
                         $action->setQuantity($quantity);

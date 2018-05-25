@@ -27,7 +27,7 @@ class Percent extends StrategyAbstract implements IndicatorInterface
         $lastActionPrice = $lastAction->getActionPrice() * self::FIXER;
 
         //logic is here
-        $calculatedPercentOfPrice = ( $lastActionPrice * $this->options['defaultPercent']) / 100;
+        $calculatedPercentOfPrice = ( $lastActionPrice * $this->options['default_percent']) / 100;
 
 
         //buy signal

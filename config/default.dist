@@ -1,14 +1,14 @@
 mokka:
     #date or symbol, default is symbol
-    default_log_type: date
+    default_log_type: symbol
 
 markets:
     binance:
       api_key: YOUR_API_KEY
       api_secret: YOUR_API_SECRET
-      maxFund: 0.001 #as BTC value. to be used for buying and selling
-      maxSell: 100 #as percent of amount to sell when sell signal comes, it will sell all
+      max_fund: 0.1 #as BTC value. to be used for buying and selling
+      max_sell: 100 #as percent of amount to sell when sell signal comes, it will sell all
 
 indicators:
     percent:
-      defaultPercent: 1.05
+      default_percent: 1.05
