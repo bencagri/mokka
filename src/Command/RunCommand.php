@@ -124,7 +124,7 @@ class RunCommand extends Command
                         $action->getActionPrice(),
                         $action->getSymbol(),
                         $action->getQuantity(),
-                        $config->get('indicators.percent.defaultPercent'),
+                        $config->get('indicators.percent.default_percent'),
                         round($action->getActionPrice() / $action->getPreviousPrice(), 5),
                         date('Y-m-d H:i:s')
                     ),
