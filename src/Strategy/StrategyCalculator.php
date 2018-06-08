@@ -79,7 +79,7 @@ class StrategyCalculator
             $action = new IdleAction();
         }
 
-
+        /** @var ActionInterface $action */
         $action->setType($actionType->getType());
         $action->setSymbol($this->getSymbol());
         $action->setMarket($this->getMarket());

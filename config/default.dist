@@ -6,7 +6,7 @@ markets:
     binance:
       api_key: YOUR_API_KEY
       api_secret: YOUR_API_SECRET
-      max_fund: 0.1 #as BTC value. to be used for buying and selling
+      max_fund: 100 #as percent of the free BTC amount when buy signal occurs.
       max_sell: 100 #as percent of amount to sell when sell signal comes, it will sell all
 
 indicators:
