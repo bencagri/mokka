@@ -52,8 +52,8 @@ class Percent extends StrategyAbstract implements IndicatorInterface
             $action->setType(ActionInterface::TYPE_IDLE);
         }
 
-        $lastActionPrice = number_format($lastActionPrice / self::FIXER,8);
-        $currentPrice = number_format($currentPrice / self::FIXER,8);
+        $lastActionPrice = number_format($lastActionPrice / self::FIXER,8,'.','');
+        $currentPrice = number_format($currentPrice / self::FIXER,8,'.','');
 
         $action->setPreviousPrice($lastActionPrice);
         $action->setActionPrice($currentPrice);

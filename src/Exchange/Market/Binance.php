@@ -107,4 +107,29 @@ class Binance implements ExchangeInterface
     }
 
 
+    /**
+     * @return mixed
+     */
+    public function getBalance()
+    {
+        //get server time. dont use user local machine time
+        $client = new Client();
+        $response = $client->get("https://api.binance.com/api/v1/time");
+        $response = json_decode($response->getBody()->getContents(), TRUE);
+
+        $account = self::$apiService->getAccount(['timestamp' => $response['serverTime']]);
+        $account = json_decode($account->getBody()->getContents(), TRUE);
+
+        $balance = null;
+        //catch BTC balance
+        foreach ($account['balances'] as $item) {
+            if ($item['asset'] == 'BTC'){
+                $balance = $item['free'];
+                break;
+            }
+        }
+
+        return $balance;
+
+    }
 }

@@ -37,4 +37,10 @@ interface ExchangeInterface
 
     public function getName();
 
+    /**
+     * Free BTC balance of the account
+     * @return bool
+     */
+    public function getBalance();
+
 }
