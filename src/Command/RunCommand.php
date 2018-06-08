@@ -7,6 +7,7 @@ use Mokka\Action\Action;
 use Mokka\Action\ActionInterface;
 use Mokka\Action\BuyAction;
 use Mokka\Action\SellAction;
+use Mokka\Calculator\Quantity;
 use Mokka\Config\Configurator;
 use Mokka\Config\Logger;
 use Mokka\Exchange\ExchangeFactory;
@@ -86,16 +87,19 @@ class RunCommand extends Command
             $table->setHeaders(array('Action', 'Previous Price', 'Action Price', 'Symbol', 'Amount', 'Trigger', 'Change', 'Date'));
 
             while(1){
+                $quantity = new Quantity();
                 $action = $strategy->run($logger);
 
                 if ($input->getOption('test') === false) {
                     if( $action->getType() == ActionInterface::TYPE_BUY) {
                         //calculate quantity
                         $maxFund = $config->get('markets.'.  $input->getOption('market') .'.max_fund');
-                        $quantity = $maxFund / $action->getActionPrice();
 
                         /** @var BuyAction $action */
-                        $action->setQuantity($quantity);
+                        $action->setQuantity(
+                            $quantity->buyQuantityCalculator($maxFund,$action->getActionPrice(),$market->getBalance())
+                        );
+
                         $market->buyOrder($action);
                     }
 
@@ -103,9 +107,10 @@ class RunCommand extends Command
                     if ($action->getType() == ActionInterface::TYPE_SELL) {
                         //get quantity to sell
                         $maxSell = $config->get('markets.'.  $input->getOption('market') .'.max_sell');
-                        $quantity = ($maxSell / 100) * $action->getQuantity();
 
-                        $action->setQuantity($quantity);
+                        $action->setQuantity(
+                            $quantity->sellQuantityCalculator($maxSell,$action->getQuantity())
+                        );
 
                         /** @var  SellAction $action */
                         $market->sellOrder($action);
