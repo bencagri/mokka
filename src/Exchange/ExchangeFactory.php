@@ -33,7 +33,7 @@ class ExchangeFactory
      */
     public function make(array $args)
     {
-        if( class_exists($this->class)) {
+        if (class_exists($this->class)) {
             $instance = new $this->class(...$args);
 
             return $instance;

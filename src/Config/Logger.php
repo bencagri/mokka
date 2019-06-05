@@ -48,7 +48,7 @@ class Logger
      */
     public function update()
     {
-       return $this->logger->update()->in($this->dbName);
+        return $this->logger->update()->in($this->dbName);
     }
 
     /**

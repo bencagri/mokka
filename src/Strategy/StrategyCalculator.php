@@ -60,7 +60,7 @@ class StrategyCalculator
         $lastAction = $logger
             ->read()
             ->where('market', '=', $this->getMarket())
-            ->where('symbol','=',$this->getSymbol())
+            ->where('symbol', '=', $this->getSymbol())
             ->sortDesc('lastUpdate')
             ->limit(1)
             ->first();
@@ -69,13 +69,13 @@ class StrategyCalculator
 
         //calculate in loop by interval
         /** @var ActionInterface $actionType */
-        $actionType = self::$indicator->calculate($this->getSymbol(),$lastAction);
+        $actionType = self::$indicator->calculate($this->getSymbol(), $lastAction);
 
         if ($actionType->getType() == ActionInterface::TYPE_BUY) {
             $action = new BuyAction();
-        }elseif ( $actionType->getType() == ActionInterface::TYPE_SELL) {
+        }elseif ($actionType->getType() == ActionInterface::TYPE_SELL) {
             $action = new SellAction();
-        }elseif ( $actionType->getType() == ActionInterface::TYPE_IDLE) {
+        }elseif ($actionType->getType() == ActionInterface::TYPE_IDLE) {
             $action = new IdleAction();
         }
 

@@ -19,7 +19,7 @@ class Percent extends StrategyAbstract implements IndicatorInterface
      * @param $lastAction Action last trade action
      * @return ActionInterface
      */
-    public function calculate($symbol,Action $lastAction) : ActionInterface
+    public function calculate($symbol, Action $lastAction) : ActionInterface
     {
         //current price of symbol
         $currentPrice = $this->exchange->getPrice($symbol) * self::FIXER;
@@ -27,7 +27,7 @@ class Percent extends StrategyAbstract implements IndicatorInterface
         $lastActionPrice = $lastAction->getActionPrice() * self::FIXER;
 
         //logic is here
-        $calculatedPercentOfPrice = ( $lastActionPrice * $this->options['default_percent']) / 100;
+        $calculatedPercentOfPrice = ($lastActionPrice * $this->options['default_percent']) / 100;
 
 
         //buy signal
@@ -52,8 +52,8 @@ class Percent extends StrategyAbstract implements IndicatorInterface
             $action->setType(ActionInterface::TYPE_IDLE);
         }
 
-        $lastActionPrice = number_format($lastActionPrice / self::FIXER,8,'.','');
-        $currentPrice = number_format($currentPrice / self::FIXER,8,'.','');
+        $lastActionPrice = number_format($lastActionPrice / self::FIXER, 8, '.', '');
+        $currentPrice = number_format($currentPrice / self::FIXER, 8, '.', '');
 
         $action->setPreviousPrice($lastActionPrice);
         $action->setActionPrice($currentPrice);
