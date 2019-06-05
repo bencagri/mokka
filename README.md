@@ -2,6 +2,9 @@ Mokka
 =======================
 Mokka is a __**free**__ command application to trade cyrpto currencies.
 
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/bencagri/mokka/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/bencagri/mokka/?branch=master)
+[![Build Status](https://scrutinizer-ci.com/g/bencagri/mokka/badges/build.png?b=master)](https://scrutinizer-ci.com/g/bencagri/mokka/build-status/master)
+
 **STATUS : IN PROGRESS**
 
 
