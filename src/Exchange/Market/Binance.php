@@ -18,7 +18,7 @@ class Binance implements ExchangeInterface
 
     public function __construct($config)
     {
-        self::$apiService = new BinanceApiService($config['api_key'],$config['api_secret']);
+        self::$apiService = new BinanceApiService($config['api_key'], $config['api_secret']);
     }
 
     /**
@@ -61,7 +61,7 @@ class Binance implements ExchangeInterface
         $params = [
             'symbol' => $action->getSymbol(),
             'price' => $action->getActionPrice(),
-            'quantity' => round($action->getQuantity(),2),
+            'quantity' => round($action->getQuantity(), 2),
             'side'  => 'BUY',
             'type'  => 'LIMIT',
             'timeInForce' => 'GTC',
@@ -123,7 +123,7 @@ class Binance implements ExchangeInterface
         $balance = null;
         //catch BTC balance
         foreach ($account['balances'] as $item) {
-            if ($item['asset'] == 'BTC'){
+            if ($item['asset'] == 'BTC') {
                 $balance = $item['free'];
                 break;
             }

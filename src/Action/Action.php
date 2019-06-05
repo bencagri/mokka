@@ -124,9 +124,9 @@ class Action
 
     private function fromArray($array)
     {
-        if(!is_null($array)){
+        if (!is_null($array)) {
             foreach ($array as $key => $item) {
-                if(property_exists(Action::class,$key)){
+                if (property_exists(Action::class, $key)) {
                     $method = 'set'.ucfirst($key);
                     $this->$method($item);
                 }
